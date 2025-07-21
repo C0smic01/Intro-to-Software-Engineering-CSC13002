@@ -1,9 +1,23 @@
 pipeline {
-    agent any
+    agent {
+        node {
+            label 'CustomNode'
+        }
+    }
+    environment {
+        PYTHON_VERSION = '3.12'
+        TOOLS_DIR = "${env.WORKSPACE}/tools"
+    }
+    options {
+        checkoutToSubdirectory('src')
+        ansiColor('xterm')
+    }
     stages {
-        stage ('build') {
+        stage('Install Python') {
             steps {
-                echo 'Surprise1'
+                dir('src') {
+                    sh 'python'
+                }
             }
         }
     }
