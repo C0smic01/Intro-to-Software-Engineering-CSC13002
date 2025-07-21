@@ -35,5 +35,14 @@ pipeline {
                 }
             }
         }
+
+        stage('Print Build Environment') {
+            steps {
+                sh '''
+                    echo "Printing environment variables:"
+                    env | sort
+                '''
+            }
+        }
     }
 }
