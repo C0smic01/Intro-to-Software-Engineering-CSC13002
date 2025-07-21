@@ -13,10 +13,25 @@ pipeline {
         ansiColor('xterm')
     }
     stages {
-        stage('Install Python') {
+        stage('Get info') {
             steps {
                 dir('src') {
-                    sh 'python'
+                    script {
+                        env.CI_COMMIT_SHORT_SHA = sh(script: 'git rev-parse HEAD', returnStdout: true).trim().take(8)
+                        env.CI_PROJECT_NAME = sh(script: '''git remote show origin -n | grep Fetch | cut -d "/" -f5 | cut -d "." -f1''', returnStdout: true).trim()
+                        env.CI_ORGANIZATION_NAME = sh(script: "git remote show origin -n | grep Fetch | cut -d '/' -f4", returnStdout: true).trim()
+                        env.DOCKER_IMAGE_NAME = "gitea.onelab.internal/${CI_ORGANIZATION_NAME}/${CI_PROJECT_NAME}"
+                        env.CONTAINER_NAME = "${CI_PROJECT_NAME}-${CI_COMMIT_SHORT_SHA}"
+                    }
+                }
+            }
+        }
+
+        stage('Verify Python') {
+            steps {
+                dir('src') {
+                    sh 'python --version'
+                    sh 'env | sort'
                 }
             }
         }
